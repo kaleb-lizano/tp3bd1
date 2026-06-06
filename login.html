@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inicio de sesión — Sistema de Planillas</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" type="image/x-icon" href="dbicon.png" />
+</head>
+<body data-page="login">
+
+  <!-- Formulario de inicio de sesión
+       ===================================================== -->
+  <main class="loginContainer">
+    <section class="loginWrapper">
+
+      <form id="form-login" class="loginForm">
+        <h1>Sistema de Planillas</h1>
+        <div id="mensaje-login"></div>
+
+        <!-- Usuario -->
+        <div class="loginInputBox">
+          <label for="username">Usuario</label>
+          <input
+            id="username"
+            type="text"
+            placeholder="Nombre de usuario"
+            autocomplete="username"
+          />
+        </div>
+
+        <!-- Contraseña -->
+        <div class="loginInputBox">
+          <label for="password">Contraseña</label>
+          <input
+            id="password"
+            type="password"
+            placeholder="Contraseña"
+            autocomplete="current-password"
+          />
+        </div>
+
+        <button id="btn-login" type="submit" class="btn btnPrimario btnLogin">
+          Ingresar
+        </button>
+
+        <!-- Credenciales dummy -->
+        <p class="ayudaLogin">
+          Prueba como admin: <strong>admin</strong> / <strong>admin123</strong><br />
+          Prueba como empleado: <strong>carlos</strong> / <strong>carlos123</strong>
+        </p>
+      </form>
+
+    </section>
+  </main>
+
+  <script src="javascript/dummy.js"></script>
+  <script src="javascript/utils.js"></script>
+  <script src="javascript/login.js"></script>
+  <script src="javascript/empleados.js"></script>
+  <script src="javascript/planillas.js"></script>
+  <script src="javascript/app.js"></script>
+</body>
+</html>

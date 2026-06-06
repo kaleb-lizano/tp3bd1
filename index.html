@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema de Planillas</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" type="image/x-icon" href="dbicon.png" />
+</head>
+<body data-page="app">
+  <main class="layoutPrincipal">
+
+    <!-- =====================================================
+         Banner de impersonación
+         ===================================================== -->
+    <div id="banner-impersonacion" class="bannerImpersonacion oculto">
+      <span>
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        Viendo como: <strong id="banner-nombre-impersonado"></strong>
+      </span>
+      <button id="btn-volver-admin" class="btn btnWarning btnAccion oculto">
+        ← Volver a Admin
+      </button>
+    </div>
+
+    <!-- =====================================================
+         Vista principal — Admin
+         ===================================================== -->
+    <section id="vista-principal" class="contenedorVista oculto">
+
+      <div class="encabezadoPrincipal encabezadoConAcciones">
+        <div>
+          <h1>Sistema de Planillas</h1>
+          <p class="subtituloVista">Gestión de empleados — vista administrador</p>
+          <p id="usuario-activo" class="usuarioActivo"></p>
+        </div>
+        <div class="accionesFiltro">
+          <button id="btn-mostrar-formulario" class="btn btnPrimario" type="button">+ Insertar empleado</button>
+          <button id="btn-logout" class="btn btnSecundario" type="button">Cerrar sesión</button>
+        </div>
+      </div>
+
+      <div id="mensaje-principal"></div>
+
+      <div class="barraFiltros">
+        <div class="campoFiltro">
+          <label for="filtro-empleado">Buscar por nombre</label>
+          <input type="text" id="filtro-empleado" placeholder="Nombre del empleado…" autocomplete="off" />
+        </div>
+        <div class="accionesFiltro">
+          <button id="btn-filtrar" class="btn btnPrimario" type="button">Filtrar</button>
+          <button id="btn-limpiar-filtro" class="btn btnSecundario" type="button">Limpiar</button>
+        </div>
+      </div>
+
+      <!-- Tabla empleados -->
+      <div class="contenedorTabla">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Puesto</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-empleados"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         Formulario empleado
+         ===================================================== -->
+    <section id="vista-formulario" class="contenedorVista oculto">
+      <div class="encabezadoPrincipal">
+        <h2 id="titulo-formulario">Insertar empleado</h2>
+        <p id="subtitulo-formulario" class="subtituloVista">Ingrese los datos del nuevo empleado.</p>
+      </div>
+
+      <div id="mensaje-formulario"></div>
+
+      <form id="form-empleado" class="formulario">
+        <input type="hidden" id="idEmpleadoEditar" />
+
+        <div class="grupoCampo">
+          <label for="valorDocumentoIdentidad">Documento de identidad</label>
+          <input type="text" id="valorDocumentoIdentidad" placeholder="Ingrese el documento" autocomplete="off" />
+        </div>
+
+        <div class="grupoCampo">
+          <label for="nombreEmpleado">Nombre completo</label>
+          <input type="text" id="nombreEmpleado" placeholder="Nombre completo" autocomplete="off" />
+        </div>
+
+        <div class="grupoCampo">
+          <label for="puestoEmpleado">Puesto</label>
+          <select id="puestoEmpleado"></select>
+        </div>
+
+        <div class="accionesFormulario">
+          <button type="submit" class="btn btnPrimario">Guardar</button>
+          <button type="button" id="btn-cancelar-formulario" class="btn btnSecundario">Cancelar</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- =====================================================
+         Vista empleado — Planillas
+         ===================================================== -->
+    <section id="vista-empleado" class="contenedorVista oculto">
+
+      <div class="encabezadoPrincipal encabezadoConAcciones">
+        <div>
+          <h2>Mi Planilla</h2>
+          <p class="subtituloVista">Empleado: <strong id="empleado-nombre-vista"></strong></p>
+        </div>
+        <div class="accionesFiltro">
+          <button id="tab-semanal" class="btn btnPrimario" type="button">Planilla Semanal</button>
+          <button id="tab-mensual" class="btn btnSecundario" type="button">Planilla Mensual</button>
+          <button id="btn-logout-empleado" class="btn btnSecundario" type="button">Cerrar sesión</button>
+        </div>
+      </div>
+
+      <!-- ---- Planilla Semanal ---- -->
+      <div id="vista-planilla-semanal">
+        <div id="mensaje-planilla-semanal"></div>
+        <p style="font-size:0.8rem;color:var(--colorGris);margin-bottom:12px;">
+          Haga clic sobre el <em>Salario Bruto</em> para ver el detalle diario, o sobre las <em>Deducciones</em> para ver el desglose.
+        </p>
+        <div class="contenedorTabla">
+          <table>
+            <thead>
+              <tr>
+                <th>Semana</th>
+                <th>Salario Bruto</th>
+                <th>Deducciones</th>
+                <th>Salario Neto</th>
+                <th>H. Ordinarias</th>
+                <th>H. Extra Norm.</th>
+                <th>H. Extra Doble</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-semanal"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ---- Planilla Mensual ---- -->
+      <div id="vista-planilla-mensual" class="oculto">
+        <div id="mensaje-planilla-mensual"></div>
+        <p style="font-size:0.8rem;color:var(--colorGris);margin-bottom:12px;">
+          Haga clic sobre el <em>Salario Bruto</em> para ver las semanas incluidas, o sobre las <em>Deducciones</em> para ver el desglose mensual.
+        </p>
+        <div class="contenedorTabla">
+          <table>
+            <thead>
+              <tr>
+                <th>Mes</th>
+                <th>Salario Bruto</th>
+                <th>Deducciones</th>
+                <th>Salario Neto</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-mensual"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- =====================================================
+       Modal de detalle de planilla
+       ===================================================== -->
+  <div id="modal-planilla" class="modal oculto" role="dialog" aria-modal="true">
+    <div class="modalContenido">
+      <h3 id="modal-planilla-titulo"></h3>
+      <div id="modal-planilla-cuerpo"></div>
+      <div class="modalAcciones">
+        <button id="btn-cerrar-modal-planilla" class="btn btnSecundario" type="button">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="javascript/dummy.js"></script>
+  <script src="javascript/utils.js"></script>
+  <script src="javascript/login.js"></script>
+  <script src="javascript/empleados.js"></script>
+  <script src="javascript/planillas.js"></script>
+  <script src="javascript/app.js"></script>
+</body>
+</html>

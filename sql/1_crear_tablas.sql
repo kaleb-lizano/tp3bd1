@@ -3,7 +3,7 @@ GO
 
 CREATE TABLE [dbo].[TipoJornada] (
     [id] INT NOT NULL PRIMARY KEY
-    , [Nombre] VARCHAR(32) NOT NULL
+    , [Nombre] VARCHAR(128) NOT NULL
     , [HoraInicio] TIME NOT NULL
     , [HoraFin] TIME NOT NULL
 );
@@ -11,7 +11,7 @@ GO
 
 CREATE TABLE [dbo].[Puesto] (
     [id] INT IDENTITY(1, 1) NOT NULL PRIMARY KEY
-    , [Nombre] VARCHAR(64) NOT NULL
+    , [Nombre] VARCHAR(128) NOT NULL
     , [SalarioXHora] MONEY NOT NULL
     , CONSTRAINT [AK_Puesto_Nombre] UNIQUE ([Nombre])
 );
@@ -19,13 +19,13 @@ GO
 
 CREATE TABLE [dbo].[TipoEvento] (
     [id] INT NOT NULL PRIMARY KEY
-    , [Nombre] VARCHAR(64) NOT NULL
+    , [Nombre] VARCHAR(128) NOT NULL
 );
 GO
 
 CREATE TABLE [dbo].[TipoMovimiento] (
     [id] INT NOT NULL PRIMARY KEY
-    , [Nombre] VARCHAR(64) NOT NULL
+    , [Nombre] VARCHAR(128) NOT NULL
     , [Accion] CHAR(8) NOT NULL
 );
 GO
@@ -43,8 +43,7 @@ CREATE TABLE [dbo].[DeduccionLey] (
     [id] INT NOT NULL PRIMARY KEY
     , [Porcentaje] DECIMAL(18, 4) NOT NULL
     , CONSTRAINT [FK_DeduccionLey_TipoDeduccion]
-        FOREIGN KEY ([id])
-        REFERENCES [dbo].[TipoDeduccion] ([id])
+        FOREIGN KEY ([id]) REFERENCES [dbo].[TipoDeduccion] ([id])
 );
 GO
 
@@ -52,14 +51,13 @@ CREATE TABLE [dbo].[DeduccionNoObligatoria] (
     [id] INT NOT NULL PRIMARY KEY
     , [FlagFijo] BIT NOT NULL
     , CONSTRAINT [FK_DeduccionNoObligatoria_TipoDeduccion]
-        FOREIGN KEY ([id])
-        REFERENCES [dbo].[TipoDeduccion] ([id])
+        FOREIGN KEY ([id]) REFERENCES [dbo].[TipoDeduccion] ([id])
 );
 GO
 
 CREATE TABLE [dbo].[Feriado] (
     [id] INT NOT NULL PRIMARY KEY
-    , [Nombre] VARCHAR(64) NOT NULL
+    , [Nombre] VARCHAR(128) NOT NULL
     , [Fecha] DATE NOT NULL
     , CONSTRAINT [AK_Feriado_Fecha] UNIQUE ([Fecha])
 );
@@ -67,11 +65,8 @@ GO
 
 CREATE TABLE [dbo].[Usuario] (
     [id] INT IDENTITY(1, 1) NOT NULL PRIMARY KEY
-    , [Username] VARCHAR(64) NOT NULL
-    , [Password] VARCHAR(64) NOT NULL
-    , [PostByUserId] INT NOT NULL
-    , [PostInIP] VARCHAR(64) NOT NULL
-    , [PostTime] DATETIME NOT NULL
+    , [Username] VARCHAR(128) NOT NULL
+    , [Password] VARCHAR(128) NOT NULL
     , CONSTRAINT [AK_Usuario_Username] UNIQUE ([Username])
 );
 GO
@@ -84,9 +79,6 @@ CREATE TABLE [dbo].[Empleado] (
     , [Nombre] VARCHAR(128) NOT NULL
     , [FechaContratacion] DATE NOT NULL
     , [FlagEsActivo] BIT NOT NULL
-    , [PostByUserId] INT NOT NULL
-    , [PostInIP] VARCHAR(64) NOT NULL
-    , [PostTime] DATETIME NOT NULL
     , CONSTRAINT [AK_Empleado_Documento] UNIQUE ([ValorDocumentoIdentidad])
     , CONSTRAINT [FK_Empleado_Puesto]
         FOREIGN KEY ([idPuesto])
@@ -120,9 +112,6 @@ CREATE TABLE [dbo].[Impersonacion] (
     , [idUsuarioAdmin] INT NOT NULL
     , [idEmpleadoImpersonado] INT NOT NULL
     , [FlagActivo] BIT NOT NULL
-    , [PostByUserId] INT NOT NULL
-    , [PostInIP] VARCHAR(64) NOT NULL
-    , [PostTime] DATETIME NOT NULL
     , CONSTRAINT [FK_Impersonacion_Admin]
         FOREIGN KEY ([idUsuarioAdmin])
         REFERENCES [dbo].[UsuarioAdministrador] ([id])
@@ -140,9 +129,6 @@ CREATE TABLE [dbo].[MesPlanilla] (
     , [FechaFin] DATE NOT NULL
     , [CantidadSemanas] INT NOT NULL
     , [FlagAbierto] BIT NOT NULL
-    , [PostByUserId] INT NOT NULL
-    , [PostInIP] VARCHAR(64) NOT NULL
-    , [PostTime] DATETIME NOT NULL
     , CONSTRAINT [AK_MesPlanilla_AnioMes] UNIQUE ([Anio], [Mes])
 );
 GO
@@ -154,13 +140,9 @@ CREATE TABLE [dbo].[SemanaPlanilla] (
     , [FechaFin] DATE NOT NULL
     , [NumeroSemana] INT NOT NULL
     , [FlagAbierta] BIT NOT NULL
-    , [PostByUserId] INT NOT NULL
-    , [PostInIP] VARCHAR(64) NOT NULL
-    , [PostTime] DATETIME NOT NULL
     , CONSTRAINT [AK_SemanaPlanilla_Fechas] UNIQUE ([FechaInicio], [FechaFin])
     , CONSTRAINT [FK_SemanaPlanilla_MesPlanilla]
-        FOREIGN KEY ([idMesPlanilla])
-        REFERENCES [dbo].[MesPlanilla] ([id])
+        FOREIGN KEY ([idMesPlanilla]) REFERENCES [dbo].[MesPlanilla] ([id])
 );
 GO
 
@@ -171,9 +153,6 @@ CREATE TABLE [dbo].[PlanillaMesXEmpleado] (
     , [SalarioBrutoMensual] MONEY NOT NULL
     , [DeduccionesMensuales] MONEY NOT NULL
     , [SalarioNetoMensual] MONEY NOT NULL
-    , [PostByUserId] INT NOT NULL
-    , [PostInIP] VARCHAR(64) NOT NULL
-    , [PostTime] DATETIME NOT NULL
     , CONSTRAINT [AK_PlanMesXEmp] UNIQUE ([idMesPlanilla], [idEmpleado])
     , CONSTRAINT [FK_PlanMesXEmp_Mes]
         FOREIGN KEY ([idMesPlanilla])
@@ -195,19 +174,13 @@ CREATE TABLE [dbo].[PlanillaSemXEmpleado] (
     , [HorasOrdinarias] INT NOT NULL
     , [HorasExtrasNormales] INT NOT NULL
     , [HorasExtrasDobles] INT NOT NULL
-    , [PostByUserId] INT NOT NULL
-    , [PostInIP] VARCHAR(64) NOT NULL
-    , [PostTime] DATETIME NOT NULL
     , CONSTRAINT [AK_PlanSemXEmp] UNIQUE ([idSemanaPlanilla], [idEmpleado])
     , CONSTRAINT [FK_PlanSemXEmp_Semana]
-        FOREIGN KEY ([idSemanaPlanilla])
-        REFERENCES [dbo].[SemanaPlanilla] ([id])
+        FOREIGN KEY ([idSemanaPlanilla]) REFERENCES [dbo].[SemanaPlanilla] ([id])
     , CONSTRAINT [FK_PlanSemXEmp_Empleado]
-        FOREIGN KEY ([idEmpleado])
-        REFERENCES [dbo].[Empleado] ([id])
+        FOREIGN KEY ([idEmpleado]) REFERENCES [dbo].[Empleado] ([id])
     , CONSTRAINT [FK_PlanSemXEmp_Mes]
-        FOREIGN KEY ([idPlanillaMesXEmpleado])
-        REFERENCES [dbo].[PlanillaMesXEmpleado] ([id])
+        FOREIGN KEY ([idPlanillaMesXEmpleado]) REFERENCES [dbo].[PlanillaMesXEmpleado] ([id])
 );
 GO
 
@@ -216,16 +189,11 @@ CREATE TABLE [dbo].[DeduccionXEmpleado] (
     , [idEmpleado] INT NOT NULL
     , [idTipoDeduccion] INT NOT NULL
     , [FechaInicio] DATE NOT NULL
-    , [PostByUserId] INT NOT NULL
-    , [PostInIP] VARCHAR(64) NOT NULL
-    , [PostTime] DATETIME NOT NULL
     , CONSTRAINT [AK_DedXEmp_EmpTipo] UNIQUE ([idEmpleado], [idTipoDeduccion])
     , CONSTRAINT [FK_DedXEmp_Empleado]
-        FOREIGN KEY ([idEmpleado])
-        REFERENCES [dbo].[Empleado] ([id])
+        FOREIGN KEY ([idEmpleado]) REFERENCES [dbo].[Empleado] ([id])
     , CONSTRAINT [FK_DedXEmp_TipoDeduccion]
-        FOREIGN KEY ([idTipoDeduccion])
-        REFERENCES [dbo].[TipoDeduccion] ([id])
+        FOREIGN KEY ([idTipoDeduccion]) REFERENCES [dbo].[TipoDeduccion] ([id])
 );
 GO
 
@@ -233,8 +201,7 @@ CREATE TABLE [dbo].[DeduccionXEmpleadoFija] (
     [id] INT NOT NULL PRIMARY KEY
     , [Monto] MONEY NOT NULL
     , CONSTRAINT [FK_DedXEmpFija_Super]
-        FOREIGN KEY ([id])
-        REFERENCES [dbo].[DeduccionXEmpleado] ([id])
+        FOREIGN KEY ([id]) REFERENCES [dbo].[DeduccionXEmpleado] ([id])
 );
 GO
 
@@ -242,8 +209,7 @@ CREATE TABLE [dbo].[DeduccionXEmpleadoPorcentual] (
     [id] INT NOT NULL PRIMARY KEY
     , [Porcentaje] DECIMAL(18, 4) NOT NULL
     , CONSTRAINT [FK_DedXEmpPorc_Super]
-        FOREIGN KEY ([id])
-        REFERENCES [dbo].[DeduccionXEmpleado] ([id])
+        FOREIGN KEY ([id]) REFERENCES [dbo].[DeduccionXEmpleado] ([id])
 );
 GO
 
@@ -253,15 +219,10 @@ CREATE TABLE [dbo].[DeduccionXEmpleadoInactiva] (
     , [idTipoDeduccion] INT NOT NULL
     , [FechaInicio] DATE NOT NULL
     , [FechaFin] DATE NOT NULL
-    , [PostByUserId] INT NOT NULL
-    , [PostInIP] VARCHAR(64) NOT NULL
-    , [PostTime] DATETIME NOT NULL
     , CONSTRAINT [FK_DedXEmpInact_Empleado]
-        FOREIGN KEY ([idEmpleado])
-        REFERENCES [dbo].[Empleado] ([id])
+        FOREIGN KEY ([idEmpleado]) REFERENCES [dbo].[Empleado] ([id])
     , CONSTRAINT [FK_DedXEmpInact_TipoDeduccion]
-        FOREIGN KEY ([idTipoDeduccion])
-        REFERENCES [dbo].[TipoDeduccion] ([id])
+        FOREIGN KEY ([idTipoDeduccion]) REFERENCES [dbo].[TipoDeduccion] ([id])
 );
 GO
 
@@ -271,9 +232,6 @@ CREATE TABLE [dbo].[DeduccionXEmpleadoXMes] (
     , [idTipoDeduccion] INT NOT NULL
     , [MontoAcumulado] MONEY NOT NULL
     , [PorcentajeAplicado] DECIMAL(9, 4) NOT NULL
-    , [PostByUserId] INT NOT NULL
-    , [PostInIP] VARCHAR(64) NOT NULL
-    , [PostTime] DATETIME NOT NULL
     , CONSTRAINT [AK_DedXEmpXMes] UNIQUE ([idPlanillaMesXEmpleado], [idTipoDeduccion])
     , CONSTRAINT [FK_DedXEmpXMes_PlanMes]
         FOREIGN KEY ([idPlanillaMesXEmpleado])
@@ -289,9 +247,6 @@ CREATE TABLE [dbo].[JornadaXEmpleadoXSemana] (
     , [idSemanaPlanilla] INT NOT NULL
     , [idEmpleado] INT NOT NULL
     , [idTipoJornada] INT NOT NULL
-    , [PostByUserId] INT NOT NULL
-    , [PostInIP] VARCHAR(64) NOT NULL
-    , [PostTime] DATETIME NOT NULL
     , CONSTRAINT [AK_JornadaXEmpXSem] UNIQUE ([idSemanaPlanilla], [idEmpleado])
     , CONSTRAINT [FK_JorXEmpXSem_Semana]
         FOREIGN KEY ([idSemanaPlanilla])
@@ -319,9 +274,6 @@ CREATE TABLE [dbo].[MarcaAsistencia] (
     , [MontoOrdinario] MONEY NOT NULL
     , [MontoExtraNormal] MONEY NOT NULL
     , [MontoExtraDoble] MONEY NOT NULL
-    , [PostByUserId] INT NOT NULL
-    , [PostInIP] VARCHAR(64) NOT NULL
-    , [PostTime] DATETIME NOT NULL
     , CONSTRAINT [FK_Marca_PlanSemXEmp]
         FOREIGN KEY ([idPlanillaSemXEmpleado])
         REFERENCES [dbo].[PlanillaSemXEmpleado] ([id])
@@ -341,9 +293,6 @@ CREATE TABLE [dbo].[MovimientoPlanilla] (
     , [Fecha] DATE NOT NULL
     , [Monto] MONEY NOT NULL
     , [NuevoSaldo] MONEY NOT NULL
-    , [PostByUserId] INT NOT NULL
-    , [PostInIP] VARCHAR(64) NOT NULL
-    , [PostTime] DATETIME NOT NULL
     , CONSTRAINT [FK_Mov_PlanSemXEmp]
         FOREIGN KEY ([idPlanillaSemXEmpleado])
         REFERENCES [dbo].[PlanillaSemXEmpleado] ([id])
@@ -370,8 +319,7 @@ CREATE TABLE [dbo].[MovimientoDeduccion] (
     [id] INT NOT NULL PRIMARY KEY
     , [PorcentajeAplicado] DECIMAL(9, 4) NOT NULL
     , CONSTRAINT [FK_MovDed_Movimiento]
-        FOREIGN KEY ([id])
-        REFERENCES [dbo].[MovimientoPlanilla] ([id])
+        FOREIGN KEY ([id]) REFERENCES [dbo].[MovimientoPlanilla] ([id])
 );
 GO
 
@@ -379,14 +327,9 @@ CREATE TABLE [dbo].[BitacoraEvento] (
     [id] INT IDENTITY(1, 1) NOT NULL PRIMARY KEY
     , [idTipoEvento] INT NOT NULL
     , [EventDate] DATE NOT NULL
-    , [Descripcion] VARCHAR(2048) NOT NULL
-    , [RefAntes] VARCHAR(2048) NOT NULL
-    , [RefDespues] VARCHAR(2048) NOT NULL
-    , [QuantityIdsToBeProcessed] INT NOT NULL
-    , [LastIdProcessed] INT NOT NULL
-    , [QuantityIdsProcessed] INT NOT NULL
+    , [Descripcion] VARCHAR(MAX) NOT NULL
     , [PostByUserId] INT NOT NULL
-    , [PostInIP] VARCHAR(64) NOT NULL
+    , [PostInIP] VARCHAR(128) NOT NULL
     , [PostTime] DATETIME NOT NULL
     , CONSTRAINT [FK_BitacoraEvento_TipoEvento]
         FOREIGN KEY ([idTipoEvento])

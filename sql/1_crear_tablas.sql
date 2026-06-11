@@ -328,12 +328,23 @@ CREATE TABLE [dbo].[BitacoraEvento] (
     , [idTipoEvento] INT NOT NULL
     , [EventDate] DATE NOT NULL
     , [Descripcion] VARCHAR(MAX) NOT NULL
-    , [PostByUserId] INT NOT NULL
     , [PostInIP] VARCHAR(128) NOT NULL
     , [PostTime] DATETIME NOT NULL
     , CONSTRAINT [FK_BitacoraEvento_TipoEvento]
         FOREIGN KEY ([idTipoEvento])
         REFERENCES [dbo].[TipoEvento] ([id])
+);
+GO
+
+CREATE TABLE [dbo].[BitacoraEventoUsuario] (
+    [id] INT NOT NULL PRIMARY KEY
+    , [PostByUserId] INT NOT NULL
+    , CONSTRAINT [FK_BitacoraEventoUsuario_BitacoraEvento]
+        FOREIGN KEY ([id])
+        REFERENCES [dbo].[BitacoraEvento] ([id])
+    , CONSTRAINT [FK_BitacoraEventoUsuario_Usuario]
+        FOREIGN KEY ([PostByUserId])
+        REFERENCES [dbo].[Usuario] ([id])
 );
 GO
 

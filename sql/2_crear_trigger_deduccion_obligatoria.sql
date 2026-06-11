@@ -1,7 +1,7 @@
 USE [TareaProgramadaTres];
 GO
 
-CREATE OR ALTER TRIGGER [dbo].[trAsociaDeduccionObligatoria]
+CREATE TRIGGER [dbo].[trAsociaDeduccionObligatoria]
 ON [dbo].[Empleado]
 AFTER INSERT
 AS

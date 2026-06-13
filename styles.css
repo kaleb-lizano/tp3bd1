@@ -13,15 +13,14 @@
   --colorHoverVerde: #b8dfbf;
   --colorRojo: #e34850;
   --colorHoverRojo: #f2b4b4;
-  --colorErr: #ff00fb;
-
-  --colorBgSecundario: var(--colorHighlights);
+--colorBgSecundario: var(--colorHighlights);
   --colorGris: #666666;
   --colorAzulClaro: #eef2ff;
   --colorVerdeClaro: #e9f8ec;
   --colorRojoClaro: #fde6e6;
-  --colorAmarillo: #d97706;
-  --colorAmarilloClaro: #fef3c7;
+  --colorNaranja: #d97706;
+  --colorHoverNaranja: #a6600f;
+  --colorNaranjaClaro: #fef3c7;
   --colorBorde: var(--colorHighlights);
   --colorSombra: rgba(34, 34, 34, 0.08);
   --colorSombraMedia: rgba(34, 34, 34, 0.15);
@@ -31,8 +30,8 @@
   --radioPill: 999px;
   --transicion: 0.15s ease;
 
-  --fuenteDisplay: Arial, Helvetica, sans-serif;
-  --fuenteTexto: Arial, Helvetica, sans-serif;
+  --fuenteDisplay: "Segoe UI", Arial, Helvetica, sans-serif;
+  --fuenteTexto: "Segoe UI", Arial, Helvetica, sans-serif;
 }
 
 /* =====================================================
@@ -83,7 +82,7 @@ body {
 
 .encabezadoPrincipal h1 {
   font-family: var(--fuenteDisplay);
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--colorNegro);
@@ -91,7 +90,7 @@ body {
 
 .encabezadoPrincipal h2 {
   font-family: var(--fuenteDisplay);
-  font-size: 1.25rem;
+  font-size: 1.55rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--colorNegro);
@@ -119,8 +118,8 @@ body {
 
 /* Banner de impersonación */
 .bannerImpersonacion {
-  background: var(--colorAmarilloClaro);
-  border: 1px solid var(--colorAmarillo);
+  background: var(--colorNaranjaClaro);
+  border: 1px solid var(--colorNaranja);
   border-radius: var(--radio);
   padding: 10px 16px;
   margin-bottom: 20px;
@@ -225,11 +224,8 @@ body {
 .btnSecundario { background: var(--colorBgSecundario); color: var(--colorNegro); border: 1px solid var(--colorBorde); }
 .btnSecundario:hover:not(:disabled) { background: var(--colorHoverHighlights); }
 
-.btnPeligro { background: var(--colorRojo); color: var(--colorBlanco); }
-.btnPeligro:hover:not(:disabled) { background: var(--colorHoverRojo); }
-
-.btnWarning { background: var(--colorAmarillo); color: var(--colorBlanco); }
-.btnWarning:hover:not(:disabled) { background: var(--colorHoverHighlights); }
+.btnImpersonar { background: var(--colorNaranja); color: var(--colorBlanco); }
+.btnImpersonar:hover:not(:disabled) { background: var(--colorHoverNaranja); }
 
 .btnAccion {
   padding: 6px 12px;
@@ -246,7 +242,7 @@ body {
 
 table { width: 100%; border-collapse: collapse; background: var(--colorBlanco); }
 
-thead { background: var(--colorHighlights); }
+thead { background: var(--colorNegro); }
 
 th {
   padding: 12px 14px;
@@ -256,7 +252,7 @@ th {
   font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--colorNegro);
+  color: var(--colorBg);
   white-space: nowrap;
 }
 
@@ -282,22 +278,6 @@ tbody tr:hover { background: var(--colorHoverHighlights); }
 .celdaClickeable:hover { color: var(--colorHoverAzul); }
 
 /* =====================================================
-   Badges / estados
-   ===================================================== */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 10px;
-  border-radius: var(--radioPill);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-}
-
-.badgeActivo { background: var(--colorVerdeClaro); color: var(--colorVerde); }
-.badgeInactivo { background: var(--colorRojoClaro); color: var(--colorRojo); }
-
-/* =====================================================
    Mensajes
    ===================================================== */
 .mensaje {
@@ -319,7 +299,7 @@ tbody tr:hover { background: var(--colorHoverHighlights); }
   display: grid;
   place-items: center;
   padding: 24px;
-  background: var(--colorNegro);
+  background: linear-gradient(135deg, var(--colorHoverAzul) 0%, var(--colorNaranja) 100%);
 }
 
 .loginWrapper { width: 100%; max-width: 400px; }
@@ -387,95 +367,6 @@ tbody tr:hover { background: var(--colorHoverHighlights); }
   border-top: 1px solid var(--colorBorde);
 }
 
-/* =====================================================
-   Tarjetas de resumen / stats
-   ===================================================== */
-.statsRow {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.statCard {
-  background: var(--colorBg);
-  border: 1px solid var(--colorBorde);
-  border-radius: var(--radio);
-  padding: 14px 16px;
-}
-
-.statCard .statLabel {
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--colorGris);
-  margin-bottom: 4px;
-}
-
-.statCard .statValue {
-  font-family: var(--fuenteDisplay);
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--colorNegro);
-}
-
-.statCard.azul { border-left: 3px solid var(--colorAzul); }
-.statCard.verde { border-left: 3px solid var(--colorVerde); }
-.statCard.rojo { border-left: 3px solid var(--colorRojo); }
-
-/* =====================================================
-   Vista de empleado (planillas)
-   ===================================================== */
-.seccionPlanilla { margin-bottom: 36px; }
-
-.seccionPlanilla h3 {
-  font-family: var(--fuenteDisplay);
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--colorGris);
-  margin-bottom: 12px;
-  padding-bottom: 8px;
-  border-bottom: 2px solid var(--colorBorde);
-}
-
-/* Detalle en modal */
-.detalleLista { display: grid; gap: 8px; }
-
-.detalleLista .filaDetalle {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 12px;
-  background: var(--colorBg);
-  border-radius: var(--radioSm);
-  font-size: 0.875rem;
-  border: 1px solid var(--colorBorde);
-}
-
-.detalleLista .filaDetalle strong { color: var(--colorNegro); }
-.detalleLista .filaDetalle span { color: var(--colorGris); }
-.detalleLista .filaDetalle .monto { font-family: var(--fuenteDisplay); font-weight: 700; color: var(--colorNegro); }
-
-/* Chips de resumen en modal de día */
-.chipsDia {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.chipDia {
-  background: var(--colorAzulClaro);
-  color: var(--colorAzul);
-  border: 1px solid var(--colorHoverHighlights);
-  border-radius: var(--radioSm);
-  padding: 4px 10px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  font-family: var(--fuenteDisplay);
-}
 
 /* =====================================================
    Responsive
@@ -486,5 +377,4 @@ tbody tr:hover { background: var(--colorHoverHighlights); }
   .encabezadoConAcciones { flex-direction: column; }
   .barraFiltros { grid-template-columns: 1fr; }
   .accionesFiltro .btn, .accionesFormulario .btn { width: 100%; }
-  .statsRow { grid-template-columns: 1fr 1fr; }
 }

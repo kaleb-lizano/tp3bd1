@@ -1,6 +1,6 @@
 
-function _esperar(ms = 0) {
-  return new Promise(res => setTimeout(res, ms));
+function _esperar() {
+  return Promise.resolve();
 }
 
 /* =====================================================

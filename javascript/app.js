@@ -186,7 +186,14 @@ async function mostrarVistaEmpleado(idEmpleado, nombre) {
   if (btnSemanal) btnSemanal.onclick = () => mostrarTabEmpleado("semanal");
   if (btnMensual) btnMensual.onclick = () => mostrarTabEmpleado("mensual");
   if (btnCerrarModal) btnCerrarModal.onclick = () => $("modal-planilla")?.classList.add("oculto");
-  if (btnLogoutEmpleado) btnLogoutEmpleado.onclick = cerrarSesion;
+  if (btnLogoutEmpleado) {
+    const estaImpersonando = Boolean(obtenerImpersonacion());
+    btnLogoutEmpleado.disabled = estaImpersonando;
+    btnLogoutEmpleado.title = estaImpersonando
+      ? "Deshabilitado durante la impersonación. Use Volver a Admin."
+      : "Cerrar sesión";
+    btnLogoutEmpleado.onclick = estaImpersonando ? null : cerrarSesion;
+  }
   if (!manejadorPlanillaRegistrado) {
     document.addEventListener("click", manejarClickPlanilla);
     manejadorPlanillaRegistrado = true;

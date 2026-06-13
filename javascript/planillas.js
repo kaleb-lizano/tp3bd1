@@ -75,7 +75,7 @@ function renderizarTablaSemanal(lista) {
 async function abrirDetalleBrutoSemanal(semana) {
   const modal = $("modal-planilla");
   $("modal-planilla-titulo").textContent =
-    `Detalle diario — semana del ${formatearFechaSinHora(semana.FechaInicio)}`;
+    `Detalle diario — Semana del ${formatearFechaSinHora(semana.FechaInicio)}`;
   $("modal-planilla-cuerpo").innerHTML =
     `<p style="color:var(--colorGris);text-align:center;padding:20px;">Cargando...</p>`;
   modal.classList.remove("oculto");
@@ -140,7 +140,7 @@ async function abrirDetalleBrutoSemanal(semana) {
 async function abrirDeduccionesSemanal(semana) {
   const modal = $("modal-planilla");
   $("modal-planilla-titulo").textContent =
-    `Deducciones — semana del ${formatearFechaSinHora(semana.FechaInicio)}`;
+    `Deducciones — Semana del ${formatearFechaSinHora(semana.FechaInicio)}`;
   $("modal-planilla-cuerpo").innerHTML =
     `<p style="color:var(--colorGris);text-align:center;padding:20px;">Cargando...</p>`;
   modal.classList.remove("oculto");

@@ -69,7 +69,7 @@ function crearFilaEmpleado(e) {
         <button class="btn btnSecundario btnAccion"
                 data-accion="editar"
                 data-id="${id}">Editar</button>
-        <button class="btn btnWarning btnAccion"
+        <button class="btn btnImpersonar btnAccion"
                 data-accion="impersonar"
                 data-id="${id}"
                 data-nombre="${nombre}">Impersonar</button>

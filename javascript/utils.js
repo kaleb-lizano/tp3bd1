@@ -40,10 +40,6 @@ function formatearFechaSinHora(fechaIso) {
   return new Date(fechaIso).toISOString().split("T")[0];
 }
 
-function formatearFecha(fechaIso) {
-  if (!fechaIso) return "-";
-  return new Date(fechaIso).toLocaleString("es-CR");
-}
 
 function formatearHora(horaStr) {
   if (!horaStr) return "-";

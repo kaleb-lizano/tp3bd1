@@ -23,6 +23,7 @@ BEGIN TRY
         , @tipoDocumento VARCHAR(32)
         , @nombrePuesto VARCHAR(128)
         , @fechaContratacion DATE
+        , @flagEsActivo BIT
         , @idBitacora INT
         ;
 
@@ -32,6 +33,7 @@ BEGIN TRY
         , @tipoDocumento = [E].[TipoDocumento]
         , @nombrePuesto = [P].[Nombre]
         , @fechaContratacion = [E].[FechaContratacion]
+        , @flagEsActivo = [E].[FlagEsActivo]
     FROM [dbo].[Empleado] AS [E]
     INNER JOIN [dbo].[Puesto] AS [P]
         ON ([E].[idPuesto] = [P].[id])
@@ -44,13 +46,19 @@ BEGIN TRY
         RETURN;
     END;
 
+    IF (@flagEsActivo = 0)
+    BEGIN
+        SELECT @outResultCode AS [outResultCode];
+        RETURN;
+    END;
+
     SET @descripcion =
         'Empleado.Id=' + CONVERT(VARCHAR(16), @idEmpleado)
         + '; Nombre=' + @nombre
         + '; TipoDocumento=' + @tipoDocumento
         + '; ValorDocumentoIdentidad=' + @inValorDocumentoIdentidad
         + '; Puesto=' + @nombrePuesto
-        + '; FechaContratacion=' + CONVERT(VARCHAR(10), @fechaContratacion, 23);
+        + '; FechaContratacion=' + CONVERT(VARCHAR(16), @fechaContratacion, 23);
 
     BEGIN TRANSACTION tEliminarEmpleado
 

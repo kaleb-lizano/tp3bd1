@@ -3,12 +3,12 @@ GO
 
 CREATE PROCEDURE [dbo].[InsertarEmpleado]
     @inNombre VARCHAR(128)
-    , @inTipoDocumento VARCHAR(32)
     , @inValorDocumentoIdentidad VARCHAR(32)
     , @inNombrePuesto VARCHAR(128)
-    , @inFechaContratacion DATE
+    , @inCuentaBancaria VARCHAR(32)
     , @inUsername VARCHAR(128)
     , @inPassword VARCHAR(128)
+    , @inFechaContratacion DATE
     , @inPostInIP VARCHAR(128)
     , @inPostByUserId INT
     , @outResultCode INT OUTPUT
@@ -22,6 +22,7 @@ BEGIN TRY
 
     DECLARE
         @TIPOEVENTO INT = 5
+        , @TIPODOCUMENTO VARCHAR(32) = 'Cedula'
         , @postTime DATETIME = GETDATE()
         , @descripcion VARCHAR(MAX)
         , @idPuesto INT
@@ -54,10 +55,11 @@ BEGIN TRY
 
     SET @descripcion =
         'Nombre=' + @inNombre
-        + '; TipoDocumento=' + @inTipoDocumento
+        + '; TipoDocumento=' + @TIPODOCUMENTO
         + '; ValorDocumentoIdentidad=' + @inValorDocumentoIdentidad
         + '; Puesto=' + @inNombrePuesto
-        + '; FechaContratacion=' + CONVERT(VARCHAR(10), @inFechaContratacion, 23)
+        + '; CuentaBancaria=' + @inCuentaBancaria
+        + '; FechaContratacion=' + CONVERT(VARCHAR(16), @inFechaContratacion, 23)
         + '; FlagEsActivo=1'
         + '; Username=' + @inUsername;
 
@@ -68,14 +70,16 @@ BEGIN TRY
             , [TipoDocumento]
             , [ValorDocumentoIdentidad]
             , [Nombre]
+            , [CuentaBancaria]
             , [FechaContratacion]
             , [FlagEsActivo]
         )
         VALUES (
             @idPuesto
-            , @inTipoDocumento
+            , @TIPODOCUMENTO
             , @inValorDocumentoIdentidad
             , @inNombre
+            , @inCuentaBancaria
             , @inFechaContratacion
             , 1
         );

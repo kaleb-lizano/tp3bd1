@@ -81,13 +81,13 @@ BEGIN TRY
         + '; TipoDocumento=' + @oldTipoDocumento
         + '; ValorDocumentoIdentidad=' + @oldValorDocumento
         + '; Puesto=' + @oldNombrePuesto
-        + '; FechaContratacion=' + CONVERT(VARCHAR(10), @oldFechaContratacion, 23)
+        + '; FechaContratacion=' + CONVERT(VARCHAR(16), @oldFechaContratacion, 23)
         + ' || Despues: Empleado.Id=' + CONVERT(VARCHAR(16), @idEmpleado)
         + '; Nombre=' + @inNuevoNombre
         + '; TipoDocumento=' + @inNuevoTipoDocumento
         + '; ValorDocumentoIdentidad=' + @inNuevoValorDocumentoIdentidad
         + '; Puesto=' + @inNuevoNombrePuesto
-        + '; FechaContratacion=' + CONVERT(VARCHAR(10), @inNuevaFechaContratacion, 23);
+        + '; FechaContratacion=' + CONVERT(VARCHAR(16), @inNuevaFechaContratacion, 23);
 
     BEGIN TRANSACTION tEditarEmpleado
 

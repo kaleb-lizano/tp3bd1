@@ -65,8 +65,8 @@ BEGIN TRY
 
         SET @descripcion =
             'Empleado.Id=' + CONVERT(VARCHAR(16), @inIdEmpleado)
-            + '; FechaInicio=' + CONVERT(VARCHAR(10), @fechaInicio, 23)
-            + '; FechaFin=' + CONVERT(VARCHAR(10), @fechaFin, 23);
+            + '; FechaInicio=' + CONVERT(VARCHAR(16), @fechaInicio, 23)
+            + '; FechaFin=' + CONVERT(VARCHAR(16), @fechaFin, 23);
     END;
 
     BEGIN TRANSACTION tEvento
@@ -114,7 +114,7 @@ BEGIN TRY
 
     SELECT
         [S].[idSemana] AS [IdPlanillaSemanal]
-        , [TM].[Nombre] AS [NombreDeduccion]
+        , [TD].[Nombre] AS [NombreDeduccion]
         , [MD].[PorcentajeAplicado] * 100 AS [Porcentaje]
         , [MP].[Monto] AS [MontoDeduccion]
     FROM @Semanas AS [S]
@@ -122,9 +122,9 @@ BEGIN TRY
         ON ([MP].[idPlanillaSemXEmpleado] = [S].[idPlanSem])
     INNER JOIN [dbo].[MovimientoDeduccion] AS [MD]
         ON ([MD].[id] = [MP].[id])
-    INNER JOIN [dbo].[TipoMovimiento] AS [TM]
-        ON ([TM].[id] = [MP].[idTipoMovimiento])
-    ORDER BY [S].[idSemana], [TM].[Nombre];
+    INNER JOIN [dbo].[TipoDeduccion] AS [TD]
+        ON ([TD].[idTipoMovimiento] = [MP].[idTipoMovimiento])
+    ORDER BY [S].[idSemana], [TD].[Nombre];
 
     SELECT
         [S].[idSemana] AS [IdPlanillaSemanal]

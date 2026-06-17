@@ -71,8 +71,8 @@ BEGIN TRY
 
         SET @descripcion =
             'Empleado.Id=' + CONVERT(VARCHAR(16), @inIdEmpleado)
-            + '; FechaInicio=' + CONVERT(VARCHAR(10), @fechaInicio, 23)
-            + '; FechaFin=' + CONVERT(VARCHAR(10), @fechaFin, 23);
+            + '; FechaInicio=' + CONVERT(VARCHAR(16), @fechaInicio, 23)
+            + '; FechaFin=' + CONVERT(VARCHAR(16), @fechaFin, 23);
     END;
 
     BEGIN TRANSACTION tEvento
@@ -115,7 +115,7 @@ BEGIN TRY
 
     SELECT
         [M].[idMes] AS [IdPlanillaMensual]
-        , [TM].[Nombre] AS [NombreDeduccion]
+        , [TD].[Nombre] AS [NombreDeduccion]
         , [DXM].[PorcentajeAplicado] * 100 AS [Porcentaje]
         , [DXM].[MontoAcumulado] AS [MontoDeduccion]
     FROM @Meses AS [M]
@@ -123,9 +123,7 @@ BEGIN TRY
         ON ([DXM].[idPlanillaMesXEmpleado] = [M].[idPlanMes])
     INNER JOIN [dbo].[TipoDeduccion] AS [TD]
         ON ([TD].[id] = [DXM].[idTipoDeduccion])
-    INNER JOIN [dbo].[TipoMovimiento] AS [TM]
-        ON ([TM].[id] = [TD].[idTipoMovimiento])
-    ORDER BY [M].[idMes], [TM].[Nombre];
+    ORDER BY [M].[idMes], [TD].[Nombre];
 
 END TRY
 BEGIN CATCH

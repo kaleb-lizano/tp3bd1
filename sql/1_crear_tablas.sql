@@ -6,6 +6,7 @@ CREATE TABLE [dbo].[TipoJornada] (
     , [Nombre] VARCHAR(128) NOT NULL
     , [HoraInicio] TIME NOT NULL
     , [HoraFin] TIME NOT NULL
+    , CONSTRAINT [AK_TipoJornada_Nombre] UNIQUE ([Nombre])
 );
 GO
 
@@ -23,6 +24,12 @@ CREATE TABLE [dbo].[TipoEvento] (
 );
 GO
 
+CREATE TABLE [dbo].[Error] (
+    [Codigo] INT NOT NULL PRIMARY KEY
+    , [Descripcion] VARCHAR(MAX) NOT NULL
+);
+GO
+
 CREATE TABLE [dbo].[TipoMovimiento] (
     [id] INT NOT NULL PRIMARY KEY
     , [Nombre] VARCHAR(128) NOT NULL
@@ -33,6 +40,8 @@ GO
 CREATE TABLE [dbo].[TipoDeduccion] (
     [id] INT NOT NULL PRIMARY KEY
     , [idTipoMovimiento] INT NOT NULL
+    , [Nombre] VARCHAR(128) NOT NULL
+    , CONSTRAINT [AK_TipoDeduccion_Nombre] UNIQUE ([Nombre])
     , CONSTRAINT [FK_TipoDeduccion_TipoMovimiento]
         FOREIGN KEY ([idTipoMovimiento])
         REFERENCES [dbo].[TipoMovimiento] ([id])
@@ -50,6 +59,7 @@ GO
 CREATE TABLE [dbo].[DeduccionNoObligatoria] (
     [id] INT NOT NULL PRIMARY KEY
     , [FlagFijo] BIT NOT NULL
+    , [Porcentaje] DECIMAL(18, 4) NOT NULL
     , CONSTRAINT [FK_DeduccionNoObligatoria_TipoDeduccion]
         FOREIGN KEY ([id]) REFERENCES [dbo].[TipoDeduccion] ([id])
 );
@@ -77,6 +87,7 @@ CREATE TABLE [dbo].[Empleado] (
     , [TipoDocumento] VARCHAR(32) NOT NULL
     , [ValorDocumentoIdentidad] VARCHAR(32) NOT NULL
     , [Nombre] VARCHAR(128) NOT NULL
+    , [CuentaBancaria] VARCHAR(32) NOT NULL
     , [FechaContratacion] DATE NOT NULL
     , [FlagEsActivo] BIT NOT NULL
     , CONSTRAINT [AK_Empleado_Documento] UNIQUE ([ValorDocumentoIdentidad])
@@ -174,6 +185,7 @@ CREATE TABLE [dbo].[PlanillaSemXEmpleado] (
     , [HorasOrdinarias] INT NOT NULL
     , [HorasExtrasNormales] INT NOT NULL
     , [HorasExtrasDobles] INT NOT NULL
+    , [FlagCerrada] BIT NOT NULL
     , CONSTRAINT [AK_PlanSemXEmp] UNIQUE ([idSemanaPlanilla], [idEmpleado])
     , CONSTRAINT [FK_PlanSemXEmp_Semana]
         FOREIGN KEY ([idSemanaPlanilla]) REFERENCES [dbo].[SemanaPlanilla] ([id])

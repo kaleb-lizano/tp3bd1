@@ -35,7 +35,7 @@ function initLogin() {
     try {
       /* Llamada al servicio de autenticación
          ===================================================== */
-      const { ok, datos } = await dummyLogin(username, password);
+      const { ok, datos } = await autenticar(username, password);
 
       if (!ok) {
         mostrarMensaje(mensaje, datos.message || "Error al iniciar sesión.", "error");
@@ -44,6 +44,7 @@ function initLogin() {
       }
 
       guardarSesion({
+        id:         datos.id ?? null,
         username:   datos.username,
         esAdmin:    datos.esAdmin   ?? false,
         idEmpleado: datos.idEmpleado ?? null,

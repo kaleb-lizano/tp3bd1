@@ -13,6 +13,7 @@ const {
 	SQL_PASSWORD,
 	SQL_DATABASE,
 	SQL_SERVER,
+	SIM_IP,
 } = process.env;
 
 const sqlEncrypt = process.env.SQL_ENCRYPT === "true";
@@ -34,5 +35,8 @@ module.exports = {
 			trustServerCertificate: true,
 			enableArithAbort: true,
 		},
+	},
+	sim: {
+		ip: SIM_IP || "0.0.0.0",
 	},
 };

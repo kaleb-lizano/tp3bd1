@@ -23,7 +23,7 @@ async function cargarPlanillaSemanal() {
     </tr>`;
 
   try {
-    const lista = await dummyObtenerPlanillasSemanal(idEmpleado);
+    const lista = await obtenerPlanillasSemanal(idEmpleado);
     planillaSemanalData = lista;
     renderizarTablaSemanal(lista);
 
@@ -83,7 +83,7 @@ async function abrirDetalleBrutoSemanal(semana) {
   try {
     /* Se consulta la asistencia día a día para la semana seleccionada
        ===================================================== */
-    const dias = await dummyObtenerDiasSemana(semana.IdPlanillaSemanal);
+    const dias = await obtenerDiasSemana(semana.IdPlanillaSemanal);
 
     if (!dias.length) {
       $("modal-planilla-cuerpo").innerHTML =
@@ -148,7 +148,7 @@ async function abrirDeduccionesSemanal(semana) {
   try {
     /* Se consultan las deducciones aplicadas en la semana seleccionada
        ===================================================== */
-    const lista = await dummyObtenerDeduccionesSemana(semana.IdPlanillaSemanal);
+    const lista = await obtenerDeduccionesSemana(semana.IdPlanillaSemanal);
     renderizarModalDeducciones(lista);
 
   } catch (err) {
@@ -177,7 +177,7 @@ async function cargarPlanillaMensual() {
   try {
     /* Se obtienen las planillas mensuales del empleado activo
        ===================================================== */
-    const lista = await dummyObtenerPlanillasMensual(idEmpleado);
+    const lista = await obtenerPlanillasMensual(idEmpleado);
     planillaMensualData = lista;
     renderizarTablaMensual(lista);
 
@@ -234,7 +234,7 @@ async function abrirDetalleBrutoMensual(mes) {
   try {
     /* Se consultan las semanas que conforman el mes seleccionado
        ===================================================== */
-    const lista = await dummyObtenerSemanasMes(mes.IdPlanillaMensual);
+    const lista = await obtenerSemanasMes(mes.IdPlanillaMensual);
 
     if (!lista.length) {
       $("modal-planilla-cuerpo").innerHTML =
@@ -289,7 +289,7 @@ async function abrirDeduccionesMensual(mes) {
   try {
     /* Se consultan las deducciones consolidadas del mes seleccionado
        ===================================================== */
-    const lista = await dummyObtenerDeduccionesMes(mes.IdPlanillaMensual);
+    const lista = await obtenerDeduccionesMes(mes.IdPlanillaMensual);
     renderizarModalDeducciones(lista);
 
   } catch (err) {

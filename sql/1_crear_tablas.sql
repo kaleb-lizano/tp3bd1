@@ -84,7 +84,6 @@ GO
 CREATE TABLE [dbo].[Empleado] (
     [id] INT IDENTITY(1, 1) NOT NULL PRIMARY KEY
     , [idPuesto] INT NOT NULL
-    , [TipoDocumento] VARCHAR(32) NOT NULL
     , [ValorDocumentoIdentidad] VARCHAR(32) NOT NULL
     , [Nombre] VARCHAR(128) NOT NULL
     , [CuentaBancaria] VARCHAR(32) NOT NULL

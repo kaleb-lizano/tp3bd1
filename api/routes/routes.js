@@ -3,44 +3,28 @@
 const express = require("express");
 const router = express.Router();
 
-const authController = require("../controllers/authController");
-const empleadoController = require("../controllers/empleadoController");
-const movimientoController = require("../controllers/movimientoController");
-const catalogoController = require("../controllers/catalogoController");
-const xmlController = require("../controllers/xmlController");
-const planillaController = require("../controllers/planillaController");
+const auth = require("../controllers/authController");
+const empleados = require("../controllers/empleadoController");
+const planilla = require("../controllers/planillaController");
+const sesion = require("../controllers/sesionController");
 
-// Auth
-router.post("/auth/login", authController.login);
-router.post("/auth/logout", authController.logout);
+// auth
+router.post("/auth/login", auth.login);
+router.post("/auth/logout", auth.logout);
 
-// Empleados
-router.get("/empleados", empleadoController.obtenerEmpleados);
-router.get("/empleados/:valorDocumento", empleadoController.consultarEmpleado);
-router.post("/empleados", empleadoController.insertarEmpleado);
-router.put("/empleados/:valorDocumento", empleadoController.actualizarEmpleado);
-router.post("/empleados/:valorDocumento/eliminar", empleadoController.eliminarEmpleado);
+// cosas de empleados
+router.get("/empleados", empleados.listar); // ?idUsuario=  (&filtro= para R02)
+router.put("/empleados/:valorDocumento", empleados.editar);
 
-// Movimientos
-router.get("/movimientos/:valorDocumento", movimientoController.obtenerMovimientos);
-router.post("/movimientos/:valorDocumento", movimientoController.insertarMovimiento);
+// puestos
+router.get("/puestos", empleados.listarPuestos);
 
-// Catálogos
-router.get("/catalogos/puestos", catalogoController.obtenerPuestos);
-router.get("/catalogos/tiposMovimiento", catalogoController.obtenerTiposMovimiento);
-router.get("/catalogos/error/:codigo", catalogoController.obtenerError);
+// impersonar y eso
+router.post("/sesion/impersonar", sesion.impersonar);
+router.post("/sesion/regresar", sesion.regresar);
 
-// Admin
-router.post("/admin/cargar-xml", xmlController.cargarXML);
-
-// Planilla semanal (R04)
-router.get("/planilla/semanal/:idEmpleado", planillaController.obtenerPlanillasSemanal);
-router.get("/planilla/semanal/:idPlanilla/dias", planillaController.obtenerDiasPlanillaSemanal);
-router.get("/planilla/semanal/:idPlanilla/deducciones", planillaController.obtenerDeduccionesSemana);
-
-// Planilla mensual (R05)
-router.get("/planilla/mensual/:idEmpleado", planillaController.obtenerPlanillasMensual);
-router.get("/planilla/mensual/:idPlanilla/semanas", planillaController.obtenerSemanasEnMes);
-router.get("/planilla/mensual/:idPlanilla/deducciones", planillaController.obtenerDeduccionesMes);
+// planillas
+router.get("/planilla/semanal/:idEmpleado", planilla.semanal); // ?cantidad=&idUsuario=
+router.get("/planilla/mensual/:idEmpleado", planilla.mensual); // ?cantidad=&idUsuario=
 
 module.exports = { routes: router };

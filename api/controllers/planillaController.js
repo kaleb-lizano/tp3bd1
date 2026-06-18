@@ -1,104 +1,56 @@
 "use strict";
-const sql = require("mssql");
-const config = require("../config");
 
-/* =====================================================
-   PLANILLA SEMANAL
-   ===================================================== */
+const { getPool, sql } = require("../db");
+const { getIp } = require("./authController");
 
-async function obtenerPlanillasSemanal(req, res) {
-  try {
-    const { idEmpleado } = req.params;
-    const conexion = await sql.connect(config.sql);
-    const resultado = await conexion.request()
-      .input("inIdEmpleado", sql.Int, idEmpleado)
-      .execute("usp_obtener_planillas_semanales");
-    res.json(resultado.recordset);
-  } catch (err) {
-    console.error("Error obtenerPlanillasSemanal:", err);
-    res.status(500).json({ message: "Error al obtener planillas semanales." });
-  }
+async function semanal(req, res) {
+	try {
+		const { idEmpleado } = req.params;
+		const { cantidad, idUsuario } = req.query;
+		const pool = await getPool();
+
+		const result = await pool
+			.request()
+			.input("inIdEmpleado", sql.Int, Number(idEmpleado))
+			.input("inCantidadSemanas", sql.Int, Number(cantidad) || 4)
+			.input("inPostInIP", sql.VarChar(128), getIp(req))
+			.input("inPostByUserId", sql.Int, Number(idUsuario))
+			.output("outResultCode", sql.Int)
+			.execute("ConsultarPlanillaSemanal");
+
+		return res.status(200).json({
+			semanas: result.recordsets[0] || [],
+			deducciones: result.recordsets[1] || [],
+			dias: result.recordsets[2] || [],
+		});
+	} catch (err) {
+		res.status(500).json({ message: err.message });
+	}
 }
 
-async function obtenerDiasPlanillaSemanal(req, res) {
-  try {
-    const { idPlanilla } = req.params;
-    const conexion = await sql.connect(config.sql);
-    const resultado = await conexion.request()
-      .input("inIdPlanillaSemanal", sql.Int, idPlanilla)
-      .execute("usp_obtener_dias_planilla_semanal");
-    res.json(resultado.recordset);
-  } catch (err) {
-    console.error("Error obtenerDiasPlanillaSemanal:", err);
-    res.status(500).json({ message: "Error al obtener días de planilla." });
-  }
+async function mensual(req, res) {
+	try {
+		const { idEmpleado } = req.params;
+		const { cantidad, idUsuario } = req.query;
+		const pool = await getPool();
+
+		const result = await pool
+			.request()
+			.input("inIdEmpleado", sql.Int, Number(idEmpleado))
+			.input("inCantidadMeses", sql.Int, Number(cantidad) || 6)
+			.input("inPostInIP", sql.VarChar(128), getIp(req))
+			.input("inPostByUserId", sql.Int, Number(idUsuario))
+			.output("outResultCode", sql.Int)
+			.execute("ConsultarPlanillaMensual");
+
+		return res.status(200).json({
+			meses: result.recordsets[0] || [],
+			deducciones: result.recordsets[1] || [],
+			semanas: result.recordsets[2] || [],
+		});
+	} catch (err) {
+		res.status(500).json({ message: err.message });
+	}
 }
 
-async function obtenerDeduccionesSemana(req, res) {
-  try {
-    const { idPlanilla } = req.params;
-    const conexion = await sql.connect(config.sql);
-    const resultado = await conexion.request()
-      .input("inIdPlanillaSemanal", sql.Int, idPlanilla)
-      .execute("usp_obtener_deducciones_planilla_semanal");
-    res.json(resultado.recordset);
-  } catch (err) {
-    console.error("Error obtenerDeduccionesSemana:", err);
-    res.status(500).json({ message: "Error al obtener deducciones semanales." });
-  }
-}
-
-/* =====================================================
-   PLANILLA MENSUAL
-   ===================================================== */
-
-async function obtenerPlanillasMensual(req, res) {
-  try {
-    const { idEmpleado } = req.params;
-    const conexion = await sql.connect(config.sql);
-    const resultado = await conexion.request()
-      .input("inIdEmpleado", sql.Int, idEmpleado)
-      .execute("usp_obtener_planillas_mensuales");
-    res.json(resultado.recordset);
-  } catch (err) {
-    console.error("Error obtenerPlanillasMensual:", err);
-    res.status(500).json({ message: "Error al obtener planillas mensuales." });
-  }
-}
-
-async function obtenerSemanasEnMes(req, res) {
-  try {
-    const { idPlanilla } = req.params;
-    const conexion = await sql.connect(config.sql);
-    const resultado = await conexion.request()
-      .input("inIdPlanillaMensual", sql.Int, idPlanilla)
-      .execute("usp_obtener_semanas_en_mes");
-    res.json(resultado.recordset);
-  } catch (err) {
-    console.error("Error obtenerSemanasEnMes:", err);
-    res.status(500).json({ message: "Error al obtener semanas del mes." });
-  }
-}
-
-async function obtenerDeduccionesMes(req, res) {
-  try {
-    const { idPlanilla } = req.params;
-    const conexion = await sql.connect(config.sql);
-    const resultado = await conexion.request()
-      .input("inIdPlanillaMensual", sql.Int, idPlanilla)
-      .execute("usp_obtener_deducciones_planilla_mensual");
-    res.json(resultado.recordset);
-  } catch (err) {
-    console.error("Error obtenerDeduccionesMes:", err);
-    res.status(500).json({ message: "Error al obtener deducciones mensuales." });
-  }
-}
-
-module.exports = {
-  obtenerPlanillasSemanal,
-  obtenerDiasPlanillaSemanal,
-  obtenerDeduccionesSemana,
-  obtenerPlanillasMensual,
-  obtenerSemanasEnMes,
-  obtenerDeduccionesMes
-};
+module.exports = { semanal, mensual };

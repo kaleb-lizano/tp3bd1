@@ -1,8 +1,11 @@
 USE [TareaProgramadaTres];
 GO
 
-CREATE PROCEDURE [dbo].[EliminarEmpleado]
+CREATE PROCEDURE [dbo].[EditarEmpleado]
     @inValorDocumentoIdentidad VARCHAR(32)
+    , @inNuevoNombre VARCHAR(128)
+    , @inNuevoValorDocumentoIdentidad VARCHAR(32)
+    , @inNuevoNombrePuesto VARCHAR(128)
     , @inPostInIP VARCHAR(128)
     , @inPostByUserId INT
     , @outResultCode INT OUTPUT
@@ -15,25 +18,24 @@ BEGIN TRY
     SET @outResultCode = 0;
 
     DECLARE
-        @TIPOEVENTO INT = 6
+        @TIPOEVENTO INT = 11
         , @postTime DATETIME = GETDATE()
         , @descripcion VARCHAR(MAX)
         , @idEmpleado INT
-        , @nombre VARCHAR(128)
-        , @tipoDocumento VARCHAR(32)
-        , @nombrePuesto VARCHAR(128)
-        , @fechaContratacion DATE
-        , @flagEsActivo BIT
+        , @oldNombre VARCHAR(128)
+        , @oldValorDocumento VARCHAR(32)
+        , @oldNombrePuesto VARCHAR(128)
+        , @oldFechaContratacion DATE
+        , @idPuestoNuevo INT
         , @idBitacora INT
         ;
 
     SELECT
         @idEmpleado = [E].[id]
-        , @nombre = [E].[Nombre]
-        , @tipoDocumento = [E].[TipoDocumento]
-        , @nombrePuesto = [P].[Nombre]
-        , @fechaContratacion = [E].[FechaContratacion]
-        , @flagEsActivo = [E].[FlagEsActivo]
+        , @oldNombre = [E].[Nombre]
+        , @oldValorDocumento = [E].[ValorDocumentoIdentidad]
+        , @oldNombrePuesto = [P].[Nombre]
+        , @oldFechaContratacion = [E].[FechaContratacion]
     FROM [dbo].[Empleado] AS [E]
     INNER JOIN [dbo].[Puesto] AS [P]
         ON ([E].[idPuesto] = [P].[id])
@@ -46,24 +48,47 @@ BEGIN TRY
         RETURN;
     END;
 
-    IF (@flagEsActivo = 0)
+    SELECT @idPuestoNuevo = [P].[id]
+    FROM [dbo].[Puesto] AS [P]
+    WHERE ([P].[Nombre] = @inNuevoNombrePuesto);
+
+    IF (@idPuestoNuevo IS NULL)
     BEGIN
+        SET @outResultCode = 50008;
+        SELECT @outResultCode AS [outResultCode];
+        RETURN;
+    END;
+
+    IF EXISTS (
+        SELECT 1
+        FROM [dbo].[Empleado] AS [E]
+        WHERE ([E].[ValorDocumentoIdentidad] = @inNuevoValorDocumentoIdentidad)
+            AND ([E].[id] != @idEmpleado)
+    )
+    BEGIN
+        SET @outResultCode = 50006;
         SELECT @outResultCode AS [outResultCode];
         RETURN;
     END;
 
     SET @descripcion =
-        'Empleado.Id=' + CONVERT(VARCHAR(16), @idEmpleado)
-        + '; Nombre=' + @nombre
-        + '; TipoDocumento=' + @tipoDocumento
-        + '; ValorDocumentoIdentidad=' + @inValorDocumentoIdentidad
-        + '; Puesto=' + @nombrePuesto
-        + '; FechaContratacion=' + CONVERT(VARCHAR(16), @fechaContratacion, 23);
+        'Antes: Empleado.Id=' + CONVERT(VARCHAR(16), @idEmpleado)
+        + '; Nombre=' + @oldNombre
+        + '; ValorDocumentoIdentidad=' + @oldValorDocumento
+        + '; Puesto=' + @oldNombrePuesto
+        + '; FechaContratacion=' + CONVERT(VARCHAR(16), @oldFechaContratacion, 23)
+        + ' || Despues: Empleado.Id=' + CONVERT(VARCHAR(16), @idEmpleado)
+        + '; Nombre=' + @inNuevoNombre
+        + '; ValorDocumentoIdentidad=' + @inNuevoValorDocumentoIdentidad
+        + '; Puesto=' + @inNuevoNombrePuesto
+        + '; FechaContratacion=' + CONVERT(VARCHAR(16), @oldFechaContratacion, 23);
 
-    BEGIN TRANSACTION tEliminarEmpleado
+    BEGIN TRANSACTION tEditarEmpleado
 
         UPDATE [dbo].[Empleado] WITH (ROWLOCK)
-        SET [FlagEsActivo] = 0
+        SET [idPuesto] = @idPuestoNuevo
+            , [ValorDocumentoIdentidad] = @inNuevoValorDocumentoIdentidad
+            , [Nombre] = @inNuevoNombre
         WHERE ([id] = @idEmpleado);
 
         INSERT [dbo].[BitacoraEvento] (
@@ -92,7 +117,7 @@ BEGIN TRY
             , @inPostByUserId
         );
 
-    COMMIT TRANSACTION tEliminarEmpleado;
+    COMMIT TRANSACTION tEditarEmpleado;
 
     SELECT @outResultCode AS [outResultCode];
 
@@ -100,7 +125,7 @@ END TRY
 BEGIN CATCH
 
     IF @@TRANCOUNT > 0 BEGIN
-        ROLLBACK TRANSACTION tEliminarEmpleado;
+        ROLLBACK TRANSACTION tEditarEmpleado;
     END;
 
     INSERT [dbo].[DBError] (

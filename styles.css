@@ -315,7 +315,7 @@ tbody tr:hover { background: var(--colorHoverHighlights); }
 
 .loginForm h1 {
   font-family: var(--fuenteDisplay);
-  font-size: 1.4rem;
+  font-size: 1.9rem;
   text-align: center;
   letter-spacing: -0.02em;
 }

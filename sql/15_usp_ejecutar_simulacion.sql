@@ -4,7 +4,6 @@ GO
 CREATE PROCEDURE [dbo].[EjecutarSimulacion]
     @inXmlOperaciones XML
     , @inPostInIP VARCHAR(128)
-    , @inPostByUserId INT
     , @outResultCode INT OUTPUT
 AS
 BEGIN
@@ -15,7 +14,6 @@ BEGIN TRY
     SET @outResultCode = 0;
 
     DECLARE
-        -- los dias de la semana al usar DATEDIFF y el patron que uso mas abajo serían de 0 a 6, donde 0 es lunes y 6 es domingo
         @JUEVES INT = 3
         , @VIERNES INT = 4
         , @DOMINGO INT = 6
@@ -33,8 +31,6 @@ BEGIN TRY
         -- los múltiplos para horas extra
         , @FACTOREXTRANORMAL DECIMAL(9, 4) = 1.5
         , @FACTOREXTRADOBLE DECIMAL(9, 4) = 2.0
-        -- default de tipo documento porque no viene en el XML
-        , @TIPODOCUMENTO VARCHAR(32) = 'Cedula'
         -- post time
         , @postTime DATETIME = GETDATE()
         -- vars para loop relacionado a fechas
@@ -73,7 +69,6 @@ BEGIN TRY
         , @hi INT
         -- vars para bitacora
         , @descripcion VARCHAR(MAX)
-        , @idBitacora INT
         -- variables para los valores de las operaciones e insertar empleados
         , @opNombre VARCHAR(128)
         , @opValorDoc VARCHAR(32)
@@ -98,7 +93,6 @@ BEGIN TRY
         , @idEmpleadoDel INT
         , @flagEsActivoDel BIT
         , @nombreDel VARCHAR(128)
-        , @tipoDocDel VARCHAR(32)
         , @nombrePuestoDel VARCHAR(128)
         , @fechaContratacionDel DATE
         -- variables para procesar a cada empleado
@@ -230,7 +224,7 @@ BEGIN TRY
             SET @esJueves = 1;
         END;
 
-        -- inicio de la semana actual = retroceder hasta el viernes ((dias transcurridos desde el ultimo viernes))
+        -- inicio de la semana actual
         SET @inicioSemanaActual = DATEADD(DAY, -(((@diaSemana - @VIERNES) + 7) % 7), @fechaOperacion);
         SET @inicioSemanaSiguiente = DATEADD(DAY, 1, @fechaOperacion);
         SET @proximoInicioSemana = DATEADD(DAY, 7, @inicioSemanaActual);
@@ -352,7 +346,6 @@ BEGIN TRY
             BEGIN
                 SET @descripcion =
                     'Nombre=' + @opNombre
-                    + '; TipoDocumento=' + @TIPODOCUMENTO
                     + '; ValorDocumentoIdentidad=' + @opValorDoc
                     + '; Puesto=' + @opPuesto
                     + '; CuentaBancaria=' + @opCuenta
@@ -363,7 +356,6 @@ BEGIN TRY
                 BEGIN TRANSACTION tInsertar
                     INSERT [dbo].[Empleado] (
                         [idPuesto]
-                        , [TipoDocumento]
                         , [ValorDocumentoIdentidad]
                         , [Nombre]
                         , [CuentaBancaria]
@@ -372,7 +364,6 @@ BEGIN TRY
                     )
                     VALUES (
                         @idPuesto
-                        , @TIPODOCUMENTO
                         , @opValorDoc
                         , @opNombre
                         , @opCuenta
@@ -415,17 +406,6 @@ BEGIN TRY
                         , @descripcion
                         , @inPostInIP
                         , @postTime
-                    );
-
-                    SET @idBitacora = SCOPE_IDENTITY();
-
-                    INSERT [dbo].[BitacoraEventoUsuario] (
-                        [id]
-                        , [PostByUserId]
-                    )
-                    VALUES (
-                        @idBitacora
-                        , @inPostByUserId
                     );
                 COMMIT TRANSACTION tInsertar;
             END;
@@ -548,17 +528,6 @@ BEGIN TRY
                         , @inPostInIP
                         , @postTime
                     );
-
-                    SET @idBitacora = SCOPE_IDENTITY();
-
-                    INSERT [dbo].[BitacoraEventoUsuario] (
-                        [id]
-                        , [PostByUserId]
-                    )
-                    VALUES (
-                        @idBitacora
-                        , @inPostByUserId
-                    );
                 COMMIT TRANSACTION tAsociar;
             END;
 
@@ -591,7 +560,9 @@ BEGIN TRY
             WHERE ([TD].[Nombre] = @opTipoDeduccion);
 
             SET @idDeduccion = NULL;
-            IF (@idEmpleadoDed IS NOT NULL) AND (@idTipoDeduccion IS NOT NULL)
+            IF (@idEmpleadoDed IS NOT NULL)
+                AND (@idTipoDeduccion IS NOT NULL)
+
             BEGIN
                 SELECT
                     @idDeduccion = [DXE].[id]
@@ -643,17 +614,6 @@ BEGIN TRY
                         , @descripcion
                         , @inPostInIP
                         , @postTime
-                    );
-
-                    SET @idBitacora = SCOPE_IDENTITY();
-
-                    INSERT [dbo].[BitacoraEventoUsuario] (
-                        [id]
-                        , [PostByUserId]
-                    )
-                    VALUES (
-                        @idBitacora
-                        , @inPostByUserId
                     );
                 COMMIT TRANSACTION tDesasociar;
             END;
@@ -879,6 +839,10 @@ BEGIN TRY
                             ON ([E].[idPuesto] = [P].[id])
                         WHERE ([E].[id] = @idEmpleado);
 
+                        SET @idTipoJornadaMarca = NULL;
+                        SET @horaInicioJornada = NULL;
+                        SET @horaFinJornada = NULL;
+                        
                         SELECT
                             @idTipoJornadaMarca = [TJ].[id]
                             , @horaInicioJornada = [TJ].[HoraInicio]
@@ -1086,20 +1050,12 @@ BEGIN TRY
                             , @inPostInIP
                             , @postTime
                         );
-                        SET @idBitacora = SCOPE_IDENTITY();
-                        INSERT [dbo].[BitacoraEventoUsuario] (
-                            [id]
-                            , [PostByUserId]
-                        )
-                        VALUES (
-                            @idBitacora
-                            , @inPostByUserId
-                        );
 
                         SET @saldoActual = @saldoDoble;
                     END;
 
-                    IF (@esJueves = 1) AND (@flagCerrada = 0)
+                    IF (@esJueves = 1)
+                        AND (@flagCerrada = 0)
                     BEGIN
                         -- deducciones porcentuales activas
                         DELETE @Deducciones;
@@ -1246,7 +1202,9 @@ BEGIN TRY
                     END;
                 END;
 
-                IF (@esJueves = 1) AND (@fechaContratacionEmp <= @inicioSemanaSiguiente) AND (@flagEliminaHoy = 0)
+                IF (@esJueves = 1)
+                    AND (@fechaContratacionEmp <= @inicioSemanaSiguiente)
+                    AND (@flagEliminaHoy = 0)
                 BEGIN
                     -- abrir mes sig
                     SET @idMesSig = NULL;
@@ -1399,15 +1357,6 @@ BEGIN TRY
                             , @inPostInIP
                             , @postTime
                         );
-                        SET @idBitacora = SCOPE_IDENTITY();
-                        INSERT [dbo].[BitacoraEventoUsuario] (
-                            [id]
-                            , [PostByUserId]
-                        )
-                        VALUES (
-                            @idBitacora
-                            , @inPostByUserId
-                        );
                     END;
                 END;
 
@@ -1435,7 +1384,6 @@ BEGIN TRY
                 @idEmpleadoDel = [E].[id]
                 , @flagEsActivoDel = [E].[FlagEsActivo]
                 , @nombreDel = [E].[Nombre]
-                , @tipoDocDel = [E].[TipoDocumento]
                 , @nombrePuestoDel = [P].[Nombre]
                 , @fechaContratacionDel = [E].[FechaContratacion]
             FROM [dbo].[Empleado] AS [E]
@@ -1443,12 +1391,12 @@ BEGIN TRY
                 ON ([E].[idPuesto] = [P].[id])
             WHERE ([E].[ValorDocumentoIdentidad] = @opValorDoc);
 
-            IF (@idEmpleadoDel IS NOT NULL) AND (@flagEsActivoDel = 1)
+            IF (@idEmpleadoDel IS NOT NULL)
+                AND (@flagEsActivoDel = 1)
             BEGIN
                 SET @descripcion =
                     'Empleado.Id=' + CONVERT(VARCHAR(16), @idEmpleadoDel)
                     + '; Nombre=' + @nombreDel
-                    + '; TipoDocumento=' + @tipoDocDel
                     + '; ValorDocumentoIdentidad=' + @opValorDoc
                     + '; Puesto=' + @nombrePuestoDel
                     + '; FechaContratacion=' + CONVERT(VARCHAR(16), @fechaContratacionDel, 23);
@@ -1471,17 +1419,6 @@ BEGIN TRY
                         , @descripcion
                         , @inPostInIP
                         , @postTime
-                    );
-
-                    SET @idBitacora = SCOPE_IDENTITY();
-
-                    INSERT [dbo].[BitacoraEventoUsuario] (
-                        [id]
-                        , [PostByUserId]
-                    )
-                    VALUES (
-                        @idBitacora
-                        , @inPostByUserId
                     );
                 COMMIT TRANSACTION tEliminar;
             END;

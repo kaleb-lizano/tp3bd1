@@ -59,8 +59,7 @@ BEGIN TRY
         FROM @Meses AS [M]
     )
     BEGIN
-        SET @descripcion =
-            'Empleado.Id=' + CONVERT(VARCHAR(16), @inIdEmpleado) + '; (sin planillas mensuales)';
+        SET @descripcion = 'Empleado.Id=' + CONVERT(VARCHAR(16), @inIdEmpleado) + '; (sin planillas mensuales)';
     END
     ELSE
     BEGIN
@@ -124,6 +123,20 @@ BEGIN TRY
     INNER JOIN [dbo].[TipoDeduccion] AS [TD]
         ON ([TD].[id] = [DXM].[idTipoDeduccion])
     ORDER BY [M].[idMes], [TD].[Nombre];
+
+    SELECT
+        [M].[idMes] AS [IdPlanillaMensual]
+        , [SP].[FechaInicio] AS [FechaInicio]
+        , [SP].[FechaFin] AS [FechaFin]
+        , [PSE].[SalarioBruto] AS [SalarioBruto]
+        , [PSE].[TotalDeducciones] AS [TotalDeducciones]
+        , [PSE].[SalarioNeto] AS [SalarioNeto]
+    FROM @Meses AS [M]
+    INNER JOIN [dbo].[PlanillaSemXEmpleado] AS [PSE]
+        ON ([PSE].[idPlanillaMesXEmpleado] = [M].[idPlanMes])
+    INNER JOIN [dbo].[SemanaPlanilla] AS [SP]
+        ON ([SP].[id] = [PSE].[idSemanaPlanilla])
+    ORDER BY [M].[idMes], [SP].[FechaInicio];
 
 END TRY
 BEGIN CATCH

@@ -1,25 +1,32 @@
-const sql = require("mssql");
-const config = require("../config");
+"use strict";
 
-async function obtenerMensajeError(codigoError) {
-  try {
-    const conexion = await sql.connect(config.sql);
-    const resultado = await conexion
-      .request()
-      .input("inCodigo", sql.VarChar(8), codigoError.toString())
-      .output("outResultCode", sql.Int)
-      .execute("usp_ObtenerDescripcionError");
+const { getPool, sql } = require("../db");
 
-    if (resultado.recordset && resultado.recordset.length > 0) {
-      return resultado.recordset[0].Descripcion;
-    }
-    return `Error interno. Código: ${codigoError}`;
-  } catch (error) {
-    console.error("Error al obtener descripción de error:", error);
-    return `Error al consultar catálogo de errores. Código: ${codigoError}`;
-  }
+async function mensajeError(codigo) {
+	if (!codigo || codigo === 0) {
+		return "";
+	}
+	try {
+		const pool = await getPool();
+		const result = await pool
+			.request()
+			.input("inCodigo", sql.Int, Number(codigo))
+			.output("outResultCode", sql.Int)
+			.execute("ObtenerError");
+
+		const fila = result.recordset && result.recordset[0];
+		if (fila && fila.Descripcion) {
+			return fila.Descripcion;
+		}
+	} catch (err) {
+		console.warn(
+			"[errorService] No se pudo obtener la descripción del código " +
+				codigo +
+				":",
+			err.message,
+		);
+	}
+	return `Error (código ${codigo})`;
 }
 
-module.exports = {
-  obtenerMensajeError
-};
+module.exports = { mensajeError };

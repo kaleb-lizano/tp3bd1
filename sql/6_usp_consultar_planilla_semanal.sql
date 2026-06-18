@@ -53,8 +53,7 @@ BEGIN TRY
         FROM @Semanas AS [S]
     )
     BEGIN
-        SET @descripcion =
-            'Empleado.Id=' + CONVERT(VARCHAR(16), @inIdEmpleado) + '; (sin planillas semanales)';
+        SET @descripcion = 'Empleado.Id=' + CONVERT(VARCHAR(16), @inIdEmpleado) + '; (sin planillas semanales)';
     END
     ELSE
     BEGIN

@@ -336,7 +336,7 @@ END TRY
 BEGIN CATCH
 
     IF @@TRANCOUNT > 0 BEGIN
-        ROLLBACK TRANSACTION;
+        ROLLBACK TRANSACTION tCargarCatalogos;
     END;
 
     INSERT [dbo].[DBError] (

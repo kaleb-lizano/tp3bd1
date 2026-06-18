@@ -1,13 +1,4 @@
 /* =====================================================
-   Carga inicial de datos XML
-   ===================================================== */
-
-async function apiCargarXml() {
-  const resp = await fetch(`${API_BASE}/admin/cargar-xml`, { method: "POST" });
-  return resp.json();
-}
-
-/* =====================================================
    Inicialización de la aplicación
    ===================================================== */
 
@@ -17,15 +8,6 @@ async function initApp() {
 
   const imp     = obtenerImpersonacion();
   const esAdmin = sesion.esAdmin || sesion.rol === "admin";
-
-  if (!localStorage.getItem(STORAGE_KEYS.xmlCargado)) {
-    try {
-      await apiCargarXml();
-      localStorage.setItem(STORAGE_KEYS.xmlCargado, "true");
-    } catch (err) {
-      console.warn("Aviso al cargar XML:", err.message);
-    }
-  }
 
   if (imp && !esAdmin) {
     terminarImpersonacion();
@@ -129,16 +111,27 @@ async function filtrarDesdeInterfaz() {
    ===================================================== */
 
 async function impersonarEmpleado(idEmpleado, nombre) {
-  const empleado = await dummyConsultarEmpleado(idEmpleado);
-  if (!empleado) {
-    mostrarMensaje($("mensaje-principal"), "No se pudo impersonar: empleado no encontrado.", "error");
-    return;
-  }
+  const sesion = obtenerSesion();
+  try {
+    const resp = await fetch(`${API_BASE}/sesion/impersonar`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idUsuarioAdmin: sesion?.id, idEmpleado: Number(idEmpleado) }),
+    });
+    const datos = await resp.json();
+    if (!resp.ok) {
+      mostrarMensaje($("mensaje-principal"), "No se pudo impersonar al empleado.", "error");
+      return;
+    }
 
-  const nombreEmpleado = empleado.Nombre || nombre || idEmpleado;
-  iniciarImpersonacion(idEmpleado, nombreEmpleado);
-  mostrarBannerImpersonacion({ idEmpleado, nombre: nombreEmpleado }, true);
-  await mostrarVistaEmpleado(idEmpleado, nombreEmpleado);
+    const nombreEmpleado = datos.Nombre || nombre || idEmpleado;
+    iniciarImpersonacion(idEmpleado, nombreEmpleado);
+    mostrarBannerImpersonacion({ idEmpleado, nombre: nombreEmpleado }, true);
+    await mostrarVistaEmpleado(idEmpleado, nombreEmpleado);
+
+  } catch (err) {
+    mostrarMensaje($("mensaje-principal"), "No se pudo conectar con el servidor.", "error");
+  }
 }
 
 function mostrarBannerImpersonacion(imp, esAdmin) {
@@ -158,7 +151,17 @@ function mostrarBannerImpersonacion(imp, esAdmin) {
   }
 }
 
-function volverAAdmin() {
+async function volverAAdmin() {
+  const sesion = obtenerSesion();
+  try {
+    await fetch(`${API_BASE}/sesion/regresar`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idUsuarioAdmin: sesion?.id }),
+    });
+  } catch (err) {
+    console.warn("Error al regresar a admin:", err);
+  }
   terminarImpersonacion();
   location.reload();
 }
@@ -186,14 +189,21 @@ async function mostrarVistaEmpleado(idEmpleado, nombre) {
   if (btnSemanal) btnSemanal.onclick = () => mostrarTabEmpleado("semanal");
   if (btnMensual) btnMensual.onclick = () => mostrarTabEmpleado("mensual");
   if (btnCerrarModal) btnCerrarModal.onclick = () => $("modal-planilla")?.classList.add("oculto");
+
   if (btnLogoutEmpleado) {
     const estaImpersonando = Boolean(obtenerImpersonacion());
+
     btnLogoutEmpleado.disabled = estaImpersonando;
     btnLogoutEmpleado.title = estaImpersonando
-      ? "Deshabilitado durante la impersonación. Use Volver a Admin."
+      ? "Regrese a la interfaz de administrador para cerrar sesión"
       : "Cerrar sesión";
-    btnLogoutEmpleado.onclick = estaImpersonando ? null : cerrarSesion;
+
+    btnLogoutEmpleado.onclick = () => {
+      if (Boolean(obtenerImpersonacion())) return;
+      cerrarSesion();
+    };
   }
+
   if (!manejadorPlanillaRegistrado) {
     document.addEventListener("click", manejarClickPlanilla);
     manejadorPlanillaRegistrado = true;

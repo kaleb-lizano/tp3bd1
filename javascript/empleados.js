@@ -7,7 +7,7 @@ async function cargarPuestos() {
   if (!select) return;
 
   try {
-    const lista = await dummyObtenerPuestos();
+    const lista = await obtenerPuestos();
     select.innerHTML =
       `<option value="">Seleccione un puesto</option>` +
       lista.map(p => `<option value="${p.Nombre}">${p.Nombre}</option>`).join("");
@@ -95,7 +95,7 @@ function limpiarFormularioEmpleado() {
 
 async function editarEmpleado(id) {
   try {
-    const e = await dummyConsultarEmpleado(id);
+    const e = await consultarEmpleado(id);
 
     if (!e) {
       mostrarMensaje($("mensaje-principal"), "Empleado no encontrado.", "error");
@@ -141,7 +141,7 @@ async function guardarEmpleadoDesdeFormulario() {
     if (docEditar) {
       /* Actualización de empleado existente
          ===================================================== */
-      resultado = await dummyActualizarEmpleado(docEditar, {
+      resultado = await actualizarEmpleado(docEditar, {
         valorDocumentoNuevo: documento,
         nombreNuevo:         nombre,
         nombrePuestoNuevo:   puesto,
@@ -149,7 +149,7 @@ async function guardarEmpleadoDesdeFormulario() {
     } else {
       /* Inserción de nuevo empleado
          ===================================================== */
-      resultado = await dummyInsertarEmpleado({
+      resultado = await insertarEmpleado({
         valorDocumentoIdentidad: documento,
         nombre,
         nombrePuesto: puesto,
@@ -185,7 +185,7 @@ async function cargarEmpleadosDesdeApi(queryParams = "") {
     const params    = new URLSearchParams(queryParams);
     const filtroNombre = params.get("filtroNombre") || "";
 
-    const lista = await dummyObtenerEmpleados(filtroNombre);
+    const lista = await obtenerEmpleados(filtroNombre);
     cargarTabla(lista);
 
   } catch (err) {

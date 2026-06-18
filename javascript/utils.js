@@ -40,6 +40,10 @@ function formatearFechaSinHora(fechaIso) {
   return new Date(fechaIso).toISOString().split("T")[0];
 }
 
+function formatearFecha(fechaIso) {
+  if (!fechaIso) return "-";
+  return new Date(fechaIso).toLocaleString("es-CR");
+}
 
 function formatearHora(horaStr) {
   if (!horaStr) return "-";
@@ -63,7 +67,7 @@ async function cerrarSesion() {
     await fetch(`${API_BASE}/auth/logout`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: sesion?.username || "" })
+      body: JSON.stringify({ idUsuario: sesion?.id ?? null })
     });
   } catch (err) {
     console.warn("Error al registrar logout:", err);

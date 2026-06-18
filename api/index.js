@@ -2,11 +2,11 @@
 
 const path = require("path");
 const express = require("express");
-const config = require("./config");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const userRoutes = require("./routes/routes");
-const xmlService = require("./services/xmlService");
+const config = require("./config");
+const { routes } = require("./routes/routes");
+const { cargarCatalogosYSimular } = require("./services/simulacionService");
 
 const app = express();
 
@@ -16,13 +16,16 @@ app.use(bodyParser.json());
 
 app.use(express.static(path.join(__dirname, "..")));
 
-app.use("/api", userRoutes.routes);
+app.use("/api", routes);
 
 app.listen(config.port, async () => {
-    console.log(`El servidor se encuentra activo en el puerto: ${config.port}`);
-    try {
-        await xmlService.cargarDatosXml();
-    } catch (err) {
-        console.warn("Ocurrió un error al cargar XML en inicio o los datos ya se encuentran cargados en la base de datos:", err.message);
-    }
+	console.log(`El servidor se encuentra activo en el puerto: ${config.port}`);
+	try {
+		await cargarCatalogosYSimular();
+	} catch (err) {
+		console.warn(
+			"[sim] No se pudo cargar/simular en el arranque (¿falta desplegar las tablas/SPs, o la BD no está accesible?):",
+			err.message,
+		);
+	}
 });
